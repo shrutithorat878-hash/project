@@ -1,43 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio website</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <dev class="portfolio-container">
-        <ul class="navlist">
-           <li><a href="#"class="active">Home</a></li>
-           <li><a href="#">work</a></li>
-           <li><a href="#">About</a></li>
-           <li><a href="#">Sevice</a></li>
-           <li><a href="#">Project</a></li>
-        </ul>  
-        <div class="left-container">
-            <div class="icons">
-                <i class="fa-brands fa-facebook"></i>
-                <i class="fa-brands fa-linkedin-in"></i>
-                <i class="fa-brands fa-twitter"></i>
-                <i class="fa-brands fa-codepen"></i>
-            </div>
-            <div class = "content">
-                <p class="intro">Hi I Am <span>Shruti Thorat</span></p>
-                <h1> Web Developer.</h1>
-                <p class = "detail"></p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsa expedita totam perferendis incidunt sed perspiciatis enim! Ad autem beatae impedit aliquid illum tempora consectetur culpa? Sit rerum perferendis accusantium quidem.</p>
-                <div class="btn-container">
-                    <button>Hire Me</button>
-                    <button>Resume</button>
-                </div>
-            </div>
+ 
+  <header>
+    <div class="container">
+      <h1 class="logo">MyLandingPage</h1>
+      <nav>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h2>Welcome to Our Website</h2>
+      <p>We help you build your dream project with creative web solutions.</p>
+      <a href="#services" class="btn">Get Started</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about">
+    <div class="container">
+      <h2>About Us</h2>
+      <p>We are a team of passionate developers and designers creating user-friendly and responsive websites for our clients. Our goal is to bring your ideas to life with elegant design and functionality.</p>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="services">
+    <div class="container">
+      <h2>Our Services</h2>
+      <div class="service-boxes">
+        <div class="box">
+          <h3>Web Design</h3>
+          <p>Creative and responsive website designs that attract users.</p>
         </div>
-        <div class="right-container"></div>
-        <div class="design">
-            <div class="circle"></div>
-            <div class="circle"></div>
+        <div class="box">
+          <h3>Development</h3>
+          <p>Clean and efficient coding for fast and scalable websites.</p>
         </div>
-    </dev>   
+        <div class="box">
+          <h3>SEO Optimization</h3>
+          <p>Improve your website’s visibility on search engines.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact">
+    <div class="container">
+      <h2>Contact Us</h2>
+      <p>Email: contact@mylandingpage.com</p>
+      <p>Phone: +91 98765 43210</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 MyLandingPage. All Rights Reserved.</p>
+  </footer>
 </body>
 </html>
