@@ -1,77 +1,226 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Landing Page</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculator</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --panel:#111827;
+      --accent:#06b6d4;
+      --muted:#94a3b8;
+      --glass: rgba(255,255,255,0.03);
+      --btn:#1f2937;
+      --danger:#ef4444;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background: linear-gradient(180deg,var(--bg), #07111a);
+      color:#e6eef6;
+    }
+
+    .calculator{
+      width:360px;
+      max-width:100%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:16px;
+      padding:18px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    .screen{
+      background:var(--glass);
+      border-radius:12px;
+      padding:12px;
+      min-height:72px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:6px;
+      margin-bottom:14px;
+      overflow:hidden;
+    }
+    .history{
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .output{
+      font-size:28px;
+      font-weight:600;
+      text-align:right;
+      letter-spacing:0.6px;
+      word-break:break-all;
+    }
+
+    .keys{
+      display:grid;
+      grid-template-columns: repeat(4,1fr);
+      gap:10px;
+    }
+
+    button{
+      background:var(--btn);
+      border: none;
+      padding:16px;
+      border-radius:10px;
+      font-size:18px;
+      color:inherit;
+      cursor:pointer;
+      box-shadow: 0 6px 12px rgba(2,6,23,0.6);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      user-select:none;
+    }
+    button:active{ transform: translateY(1px); }
+
+    .span-2{ grid-column: span 2; }
+    .op{ background: linear-gradient(180deg, rgba(6,182,212,0.18), rgba(6,182,212,0.08)); color:var(--accent); font-weight:600; }
+    .equals{ background: linear-gradient(180deg,#06b6d4,#028f9a); color:#042024; font-weight:700; box-shadow: 0 8px 20px rgba(6,182,212,0.12); }
+    .clear{ background: linear-gradient(180deg, rgba(239,68,68,0.15), rgba(239,68,68,0.06)); color:var(--danger); }
+    .del{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color:var(--muted); }
+
+    .footer{ margin-top:12px; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; }
+
+    @media (max-width:420px){
+      .calculator{ width:100%; }
+      .output{ font-size:24px; }
+      button{ padding:14px; font-size:16px; }
+    }
+
+  </style>
 </head>
 <body>
- 
-  <header>
-    <div class="container">
-      <h1 class="logo">MyLandingPage</h1>
-      <nav>
-        <ul>
-          <li><a href="#home">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-      </nav>
+  <div class="calculator" role="application" aria-label="Calculator">
+    <div class="screen">
+      <div class="history" id="history" aria-live="polite"></div>
+      <div class="output" id="output">0</div>
     </div>
-  </header>
 
-  <!-- Hero Section -->
-  <section id="home" class="hero">
-    <div class="hero-content">
-      <h2>Welcome to Our Website</h2>
-      <p>We help you build your dream project with creative web solutions.</p>
-      <a href="#services" class="btn">Get Started</a>
+    <div class="keys">
+      <button class="clear" id="clear">C</button>
+      <button class="del" id="del">←</button>
+      <button class="op" data-value="%">%</button>
+      <button class="op" data-value="/">÷</button>
+
+      <button data-value="7">7</button>
+      <button data-value="8">8</button>
+      <button data-value="9">9</button>
+      <button class="op" data-value="*">×</button>
+
+      <button data-value="4">4</button>
+      <button data-value="5">5</button>
+      <button data-value="6">6</button>
+      <button class="op" data-value="-">−</button>
+
+      <button data-value="1">1</button>
+      <button data-value="2">2</button>
+      <button data-value="3">3</button>
+      <button class="op" data-value="+">+</button>
+
+      <button data-value="0" class="span-2">0</button>
+      <button data-value=".">.</button>
+      <button class="equals" id="equals">=</button>
     </div>
-  </section>
 
-  <!-- About Section -->
-  <section id="about" class="about">
-    <div class="container">
-      <h2>About Us</h2>
-      <p>We are a team of passionate developers and designers creating user-friendly and responsive websites for our clients. Our goal is to bring your ideas to life with elegant design and functionality.</p>
+    <div class="footer">
+      <div>Keyboard supported — numbers, + - * / % . Enter =</div>
+      <div>Made with </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Services Section -->
-  <section id="services" class="services">
-    <div class="container">
-      <h2>Our Services</h2>
-      <div class="service-boxes">
-        <div class="box">
-          <h3>Web Design</h3>
-          <p>Creative and responsive website designs that attract users.</p>
-        </div>
-        <div class="box">
-          <h3>Development</h3>
-          <p>Clean and efficient coding for fast and scalable websites.</p>
-        </div>
-        <div class="box">
-          <h3>SEO Optimization</h3>
-          <p>Improve your website’s visibility on search engines.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <script>
+    (function(){
+      const outputEl = document.getElementById('output');
+      const historyEl = document.getElementById('history');
+      const keys = document.querySelectorAll('[data-value]');
+      const clearBtn = document.getElementById('clear');
+      const delBtn = document.getElementById('del');
+      const eqBtn = document.getElementById('equals');
 
-  <!-- Contact Section -->
-  <section id="contact" class="contact">
-    <div class="container">
-      <h2>Contact Us</h2>
-      <p>Email: contact@mylandingpage.com</p>
-      <p>Phone: +91 98765 43210</p>
-    </div>
-  </section>
+      let expression = '';
+      let lastResult = null;
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2025 MyLandingPage. All Rights Reserved.</p>
-  </footer>
+      function refresh(){
+        outputEl.textContent = expression || '0';
+        historyEl.textContent = lastResult !== null ? 'Ans: ' + String(lastResult) : '';
+      }
+
+      // allow only certain characters when evaluating
+      function safeEval(expr){
+        // disallow letters and other weird chars
+        if(/[^0-9+\-*/().%\s]/.test(expr)) throw new Error('Invalid characters');
+        // replace unicode multiplication/division signs if any
+        expr = expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+        // prevent expressions like "2++2"? JS can handle but it's okay.
+        return Function('return (' + expr + ')')();
+      }
+
+      keys.forEach(btn => {
+        btn.addEventListener('click', ()=>{
+          const val = btn.dataset.value;
+          // If user clicked percent sign, convert to /100 when evaluating
+          expression += val;
+          refresh();
+        })
+      });
+
+      clearBtn.addEventListener('click', ()=>{
+        expression = '';
+        lastResult = null;
+        refresh();
+      });
+
+      delBtn.addEventListener('click', ()=>{
+        expression = expression.slice(0,-1);
+        refresh();
+      });
+
+      eqBtn.addEventListener('click', compute);
+
+      function compute(){
+        if(!expression) return;
+        try{
+          // handle percent by replacing e.g. "50%" => "(50/100)"
+          // simple replace: convert occurrences of number% into (number/100)
+          let expr = expression.replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
+          const val = safeEval(expr);
+          lastResult = val;
+          expression = String(val);
+          refresh();
+        }catch(e){
+          outputEl.textContent = 'Error';
+        }
+      }
+
+      // keyboard support
+      window.addEventListener('keydown', (ev)=>{
+        const key = ev.key;
+        if((/^[0-9]$/).test(key)){
+          expression += key; refresh(); return;
+        }
+        if(key === '.') { expression += key; refresh(); return; }
+        if(key === 'Enter' || key === '='){ ev.preventDefault(); compute(); return; }
+        if(key === 'Backspace'){ expression = expression.slice(0,-1); refresh(); return; }
+        if(key === 'Escape'){ expression = ''; lastResult = null; refresh(); return; }
+        if(['+','-','*','/','%','(',')'].includes(key)){ expression += key; refresh(); return; }
+      });
+
+      // small UX: prevent text selection while clicking repeatedly
+      document.querySelectorAll('button').forEach(b=>b.onmousedown = e=>e.preventDefault());
+
+      refresh();
+    })();
+  </script>
 </body>
 </html>
