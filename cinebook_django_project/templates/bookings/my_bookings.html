@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:900px">
+  <h4 class="cb-section-title mb-4"><i class="bi bi-ticket me-2 text-accent"></i>My Bookings</h4>
+  {% if bookings %}
+    {% for booking in bookings %}
+    <div class="cb-booking-row mb-3">
+      <div class="cb-booking-left">
+        <div class="cb-booking-movie">{{ booking.show.movie.title }}</div>
+        <div class="text-muted small mb-1"><i class="bi bi-building me-1"></i>{{ booking.show.screen.theater.name }}, {{ booking.show.screen.theater.city }}</div>
+        <div class="text-muted small"><i class="bi bi-calendar3 me-1"></i>{{ booking.show.show_date|date:"D, d M Y" }} &nbsp;·&nbsp; <i class="bi bi-clock me-1"></i>{{ booking.show.show_time|time:"g:i A" }}</div>
+        <div class="mt-2">{% for seat in booking.seats.all %}<span class="cb-seat-badge">{{ seat.seat_number }}</span>{% endfor %}</div>
+      </div>
+      <div class="cb-booking-right">
+        <div class="cb-booking-amount">₹{{ booking.total_amount }}</div>
+        <div class="text-muted small">#{{ booking.booking_ref }}</div>
+        <span class="cb-status-badge {% if booking.status == 'confirmed' %}confirmed{% elif booking.status == 'cancelled' %}cancelled{% else %}pending{% endif %}">{{ booking.get_status_display }}</span>
+        <div class="mt-2 d-flex gap-2">
+          <a href="{% url 'bookings:confirmation' booking.booking_id %}" class="cb-btn-sm-outline">View</a>
+          {% if booking.status == 'confirmed' %}<a href="{% url 'bookings:cancel_booking' booking.booking_id %}" class="cb-btn-sm-red" onclick="return confirm('Cancel this booking?')">Cancel</a>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="cb-empty-state">
+      <div class="cb-empty-icon">🎫</div>
+      <h5>No bookings yet</h5>
+      <p class="text-muted">Book your first movie ticket now!</p>
+      <a href="{% url 'movies:home' %}" class="cb-btn-red">Browse Movies</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

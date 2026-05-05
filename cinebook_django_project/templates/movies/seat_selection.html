@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block title %}Select Seats — {{ show.movie.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+  <!-- HEADER -->
+  <div class="cb-seats-header mb-4">
+    <div>
+      <h4 class="cb-detail-title mb-1">{{ show.movie.title }}</h4>
+      <div class="text-muted small">
+        <i class="bi bi-building me-1"></i>{{ show.screen.theater.name }}, {{ show.screen.theater.city }}
+        &nbsp;·&nbsp;
+        <i class="bi bi-calendar3 me-1"></i>{{ show.show_date|date:"D, d M Y" }}
+        &nbsp;·&nbsp;
+        <i class="bi bi-clock me-1"></i>{{ show.show_time|time:"g:i A" }}
+        &nbsp;·&nbsp;
+        <span class="text-accent fw-600">₹{{ show.price }} / seat</span>
+      </div>
+    </div>
+    <a href="{% url 'movies:movie_detail' show.movie.pk %}" class="cb-btn-outline">
+      <i class="bi bi-arrow-left me-1"></i>Back
+    </a>
+  </div>
+
+  <div class="row g-4">
+    <!-- SEAT MAP -->
+    <div class="col-lg-8">
+      <div class="cb-card">
+
+        <!-- TASK 5: Reservation Timer -->
+        <div class="cb-timer-bar" id="reservationTimer" style="display:none">
+          <span>⏱</span>
+          <span>Seats reserved for</span>
+          <span class="cb-timer-count" id="timerDisplay">5:00</span>
+          <span class="text-muted small ms-auto">Select seats to start timer</span>
+        </div>
+
+        <!-- Screen -->
+        <div class="cb-screen-bar"></div>
+        <div class="cb-screen-label">S C R E E N</div>
+
+        <!-- Legend -->
+        <div class="cb-seat-legend">
+          <span><span class="cb-legend-dot avail"></span> Available</span>
+          <span><span class="cb-legend-dot sel"></span> Selected</span>
+          <span><span class="cb-legend-dot bkd"></span> Booked</span>
+        </div>
+
+        <!-- Seats -->
+        <div class="cb-seat-grid" id="seatGrid">
+          {% for row in rows %}
+          <div class="cb-seat-row">
+            <span class="cb-row-label">{{ row.label }}</span>
+            {% for seat in row.seats %}
+            <div class="cb-seat {% if seat.booked %}booked{% endif %}"
+                 id="seat-{{ seat.id }}"
+                 data-id="{{ seat.id }}"
+                 data-booked="{{ seat.booked|yesno:'true,false' }}"
+                 onclick="toggleSeat('{{ seat.id }}', {{ seat.booked|yesno:'true,false' }})">
+              {{ seat.num }}
+            </div>
+            {% if forloop.counter == 6 %}
+            <div class="cb-seat-gap"></div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BOOKING PANEL -->
+    <div class="col-lg-4">
+      <div class="cb-card cb-booking-panel" id="bookingPanel">
+        <h5 class="fw-600 mb-3"><i class="bi bi-ticket me-2 text-accent"></i>Booking Summary</h5>
+
+        <div id="noSeatMsg" class="text-muted text-center py-3">
+          <i class="bi bi-cursor fs-2 d-block mb-2"></i>
+          Click seats on the map to select
+        </div>
+
+        <div id="summaryContent" style="display:none">
+          <div class="cb-summary-row"><span>Movie</span><span class="fw-600">{{ show.movie.title }}</span></div>
+          <div class="cb-summary-row"><span>Theater</span><span>{{ show.screen.theater.name }}</span></div>
+          <div class="cb-summary-row"><span>Date</span><span>{{ show.show_date|date:"d M Y" }}</span></div>
+          <div class="cb-summary-row"><span>Time</span><span>{{ show.show_time|time:"g:i A" }}</span></div>
+          <div class="cb-summary-row"><span>Seats</span><span id="sumSeats" class="text-accent fw-600">—</span></div>
+          <div class="cb-summary-row"><span>Price/seat</span><span>₹{{ show.price }}</span></div>
+          <hr style="border-color:#1e2a40"/>
+          <div class="cb-summary-row total"><span>TOTAL</span><span id="sumTotal" class="text-gold fw-700">₹0</span></div>
+
+          <!-- TASK 4: Payment method selection -->
+          <div class="mt-3 mb-2">
+            <div class="cb-filter-label mb-2">Payment Method</div>
+            <div class="cb-pay-methods">
+              <label class="cb-pay-method active">
+                <input type="radio" name="payMethod" value="card" checked/>
+                <span class="pm-icon">💳</span><span>Card</span>
+              </label>
+              <label class="cb-pay-method">
+                <input type="radio" name="payMethod" value="upi"/>
+                <span class="pm-icon">📱</span><span>UPI</span>
+              </label>
+              <label class="cb-pay-method">
+                <input type="radio" name="payMethod" value="razorpay"/>
+                <span class="pm-icon">⚡</span><span>Razorpay</span>
+              </label>
+              <label class="cb-pay-method">
+                <input type="radio" name="payMethod" value="wallet"/>
+                <span class="pm-icon">👛</span><span>Wallet</span>
+              </label>
+            </div>
+          </div>
+
+          {% if user.is_authenticated %}
+          <button class="cb-btn-red w-100 mt-2" id="payBtn" onclick="confirmBooking()">
+            <i class="bi bi-lock me-2"></i>Proceed to Pay
+          </button>
+          {% else %}
+          <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="cb-btn-red w-100 mt-2 text-center d-block">
+            Login to Book
+          </a>
+          {% endif %}
+
+          <div class="text-center text-muted small mt-2">
+            <i class="bi bi-shield-check me-1"></i>Secure · 100% Refund on Cancellation
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" data-bs-backdrop="static" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content cb-modal-dark text-center p-4">
+      <div class="cb-spinner mb-3"></div>
+      <div class="text-muted small" id="loadingText">Processing payment...</div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+const SHOW_ID   = {{ show.id }};
+const SEAT_PRICE = {{ show.price }};
+const CSRF_TOKEN = '{{ csrf_token }}';
+
+let selectedSeats = [];
+let timerInterval = null;
+let timerSecs = 300;
+
+function toggleSeat(sid, isBooked) {
+  if (isBooked) return;
+  const el  = document.getElementById('seat-' + sid);
+  const idx = selectedSeats.indexOf(sid);
+
+  if (idx === -1) {
+    if (selectedSeats.length >= 8) {
+      showToast('Maximum 8 seats allowed', 'error');
+      return;
+    }
+    selectedSeats.push(sid);
+    el.classList.add('selected');
+    if (selectedSeats.length === 1 && !timerInterval) startTimer();
+  } else {
+    selectedSeats.splice(idx, 1);
+    el.classList.remove('selected');
+    if (selectedSeats.length === 0) clearTimer();
+  }
+  updateSummary();
+}
+
+function updateSummary() {
+  const hasSeats = selectedSeats.length > 0;
+  document.getElementById('noSeatMsg').style.display    = hasSeats ? 'none'  : 'block';
+  document.getElementById('summaryContent').style.display = hasSeats ? 'block' : 'none';
+  if (!hasSeats) return;
+
+  document.getElementById('sumSeats').textContent = selectedSeats.join(', ');
+  document.getElementById('sumTotal').textContent = '₹' + (SEAT_PRICE * selectedSeats.length);
+}
+
+// TASK 5: Reservation Timer
+function startTimer() {
+  timerSecs = 300;
+  const timerBar = document.getElementById('reservationTimer');
+  timerBar.style.display = 'flex';
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    timerSecs--;
+    updateTimerDisplay();
+    if (timerSecs <= 0) {
+      clearTimer();
+      selectedSeats = [];
+      updateSummary();
+      document.querySelectorAll('.cb-seat.selected').forEach(s => s.classList.remove('selected'));
+      showToast('⏰ Reservation timed out! Please select seats again.', 'error');
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m  = Math.floor(timerSecs / 60);
+  const s  = timerSecs % 60;
+  const el = document.getElementById('timerDisplay');
+  el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+  el.classList.toggle('urgent', timerSecs <= 60);
+}
+
+function clearTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  document.getElementById('reservationTimer').style.display = 'none';
+}
+
+// TASK 4: Confirm Booking + Payment
+function confirmBooking() {
+  if (!selectedSeats.length) return;
+
+  const payMethod = document.querySelector('input[name="payMethod"]:checked').value;
+
+  const modal = new bootstrap.Modal(document.getElementById('loadingModal'));
+  modal.show();
+  document.getElementById('loadingText').textContent = 'Processing payment securely...';
+
+  fetch(`/bookings/book/${SHOW_ID}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': CSRF_TOKEN,
+    },
+    body: JSON.stringify({ seats: selectedSeats, payment_method: payMethod }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    modal.hide();
+    if (data.success) {
+      clearTimer();
+      window.location.href = data.redirect;
+    } else {
+      showToast(data.error || 'Booking failed. Please try again.', 'error');
+    }
+  })
+  .catch(() => {
+    modal.hide();
+    showToast('Network error. Please try again.', 'error');
+  });
+}
+
+// Payment method UI
+document.querySelectorAll('.cb-pay-method').forEach(label => {
+  label.addEventListener('click', () => {
+    document.querySelectorAll('.cb-pay-method').forEach(l => l.classList.remove('active'));
+    label.classList.add('active');
+  });
+});
+
+function showToast(msg, type='') {
+  const t = document.getElementById('cb-toast');
+  if (!t) {
+    const toast = document.createElement('div');
+    toast.id = 'cb-toast';
+    toast.className = 'cb-toast' + (type === 'error' ? ' error' : '');
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+  }
+}
+</script>
+{% endblock %}
+{% endblock %}

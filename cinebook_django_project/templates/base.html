@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}CineBook{% endblock %} | BookMyShow Clone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/cinebook.css' %}"/>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="cb-nav navbar navbar-expand-lg">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand cb-logo" href="{% url 'movies:home' %}">Cine<span>Book</span></a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <i class="bi bi-list text-white fs-4"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link cb-nav-link" href="{% url 'movies:home' %}"><i class="bi bi-film me-1"></i>Movies</a>
+        </li>
+        {% if user.is_staff %}
+        <li class="nav-item">
+          <a class="nav-link cb-nav-link gold" href="{% url 'bookings:admin_dashboard' %}"><i class="bi bi-bar-chart me-1"></i>Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link cb-nav-link gold" href="/admin/"><i class="bi bi-gear me-1"></i>Admin</a>
+        </li>
+        {% endif %}
+      </ul>
+
+      <ul class="navbar-nav ms-auto gap-2">
+        {% if user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a class="nav-link cb-nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle me-1"></i>{{ user.first_name|default:user.username }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end cb-dropdown">
+            <li><a class="dropdown-item" href="{% url 'bookings:my_bookings' %}"><i class="bi bi-ticket me-2"></i>My Bookings</a></li>
+            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"/></li>
+            <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+          </ul>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="cb-btn-outline nav-link" href="{% url 'accounts:login' %}">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="cb-btn-red nav-link" href="{% url 'accounts:register' %}">Sign Up</a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MESSAGES ══ -->
+{% if messages %}
+<div class="cb-messages">
+  {% for msg in messages %}
+  <div class="cb-alert cb-alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+    {{ msg }}
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ══ MAIN CONTENT ══ -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ══ FOOTER ══ -->
+<footer class="cb-footer mt-5">
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <div class="cb-logo mb-2" style="font-size:1.6rem">Cine<span>Book</span></div>
+        <p class="text-muted small">Your one-stop destination for movie tickets. Built with Django + MySQL.</p>
+      </div>
+      <div class="col-md-2 mb-3">
+        <h6 class="text-white mb-3">Movies</h6>
+        <ul class="list-unstyled small text-muted">
+          <li><a href="{% url 'movies:home' %}" class="cb-footer-link">Now Showing</a></li>
+          <li><a href="{% url 'movies:home' %}?upcoming=1" class="cb-footer-link">Upcoming</a></li>
+        </ul>
+      </div>
+      <div class="col-md-2 mb-3">
+        <h6 class="text-white mb-3">Account</h6>
+        <ul class="list-unstyled small text-muted">
+          {% if user.is_authenticated %}
+          <li><a href="{% url 'bookings:my_bookings' %}" class="cb-footer-link">My Bookings</a></li>
+          <li><a href="{% url 'accounts:profile' %}" class="cb-footer-link">Profile</a></li>
+          {% else %}
+          <li><a href="{% url 'accounts:login' %}" class="cb-footer-link">Login</a></li>
+          <li><a href="{% url 'accounts:register' %}" class="cb-footer-link">Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h6 class="text-white mb-3">Tech Stack</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="cb-tech-badge">Python 3</span>
+          <span class="cb-tech-badge">Django</span>
+          <span class="cb-tech-badge">MySQL</span>
+          <span class="cb-tech-badge">Bootstrap 5</span>
+        </div>
+      </div>
+    </div>
+    <hr style="border-color:#1e2a40"/>
+    <p class="text-center text-muted small mb-0">© 2025 CineBook — Internship Project · Django Movie Booking System</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% load static %}
+<script src="{% static 'js/cinebook.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

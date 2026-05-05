@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:560px">
+  <div class="cb-card">
+    <h5 class="fw-600 mb-4"><i class="bi bi-person-circle me-2 text-accent"></i>My Profile</h5>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="cb-form-label">First Name</label>
+          <input type="text" name="first_name" class="cb-input" value="{{ user.first_name }}"/>
+        </div>
+        <div class="col-6">
+          <label class="cb-form-label">Last Name</label>
+          <input type="text" name="last_name" class="cb-input" value="{{ user.last_name }}"/>
+        </div>
+        <div class="col-12">
+          <label class="cb-form-label">Email</label>
+          <input type="email" name="email" class="cb-input" value="{{ user.email }}"/>
+        </div>
+        <div class="col-6">
+          <label class="cb-form-label">Phone</label>
+          <input type="text" name="phone" class="cb-input" value="{{ profile.phone }}"/>
+        </div>
+        <div class="col-6">
+          <label class="cb-form-label">City</label>
+          <input type="text" name="city" class="cb-input" value="{{ profile.city }}" placeholder="Mumbai"/>
+        </div>
+      </div>
+      <button type="submit" class="cb-btn-red mt-4">Save Changes</button>
+    </form>
+    <hr style="border-color:#1e2a40;margin:1.5rem 0"/>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="text-muted small">Member since {{ user.date_joined|date:"M Y" }}</div>
+      <a href="{% url 'bookings:my_bookings' %}" class="cb-btn-outline">View My Bookings</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

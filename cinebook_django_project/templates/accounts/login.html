@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:420px">
+  <div class="cb-card">
+    <div class="text-center mb-4">
+      <div class="cb-logo mb-2" style="font-size:2rem">Cine<span>Book</span></div>
+      <h5 class="fw-600">Welcome back</h5>
+      <p class="text-muted small">Login to book your tickets</p>
+    </div>
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="cb-form-label">Username</label>
+        <input type="text" name="username" class="cb-input" placeholder="Your username" required autofocus/>
+      </div>
+      <div class="mb-3">
+        <label class="cb-form-label">Password</label>
+        <input type="password" name="password" class="cb-input" placeholder="Your password" required/>
+      </div>
+      <button type="submit" class="cb-btn-red w-100">Login</button>
+    </form>
+    <p class="text-center text-muted small mt-3">New here? <a href="{% url 'accounts:register' %}" class="text-accent">Create account</a></p>
+  </div>
+</div>
+{% endblock %}

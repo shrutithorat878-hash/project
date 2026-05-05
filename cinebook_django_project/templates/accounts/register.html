@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:480px">
+  <div class="cb-card">
+    <div class="text-center mb-4">
+      <div class="cb-logo mb-2" style="font-size:2rem">Cine<span>Book</span></div>
+      <h5 class="fw-600">Create your account</h5>
+      <p class="text-muted small">Join thousands booking smarter</p>
+    </div>
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="cb-form-label">First Name</label>
+          <input type="text" name="first_name" class="cb-input" placeholder="Rahul" required/>
+        </div>
+        <div class="col-6">
+          <label class="cb-form-label">Last Name</label>
+          <input type="text" name="last_name" class="cb-input" placeholder="Sharma"/>
+        </div>
+        <div class="col-12">
+          <label class="cb-form-label">Username</label>
+          <input type="text" name="username" class="cb-input" placeholder="rahul123" required/>
+        </div>
+        <div class="col-12">
+          <label class="cb-form-label">Email</label>
+          <input type="email" name="email" class="cb-input" placeholder="rahul@email.com" required/>
+        </div>
+        <div class="col-12">
+          <label class="cb-form-label">Phone</label>
+          <input type="tel" name="phone" class="cb-input" placeholder="9876543210"/>
+        </div>
+        <div class="col-6">
+          <label class="cb-form-label">Password</label>
+          <input type="password" name="password1" class="cb-input" required/>
+        </div>
+        <div class="col-6">
+          <label class="cb-form-label">Confirm</label>
+          <input type="password" name="password2" class="cb-input" required/>
+        </div>
+      </div>
+      <button type="submit" class="cb-btn-red w-100 mt-4">Create Account</button>
+    </form>
+    <p class="text-center text-muted small mt-3">Already have an account? <a href="{% url 'accounts:login' %}" class="text-accent">Login</a></p>
+  </div>
+</div>
+{% endblock %}

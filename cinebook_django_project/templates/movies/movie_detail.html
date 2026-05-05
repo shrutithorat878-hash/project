@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+  <!-- MOVIE HEADER -->
+  <div class="cb-movie-detail-header">
+    <div class="row align-items-start g-4">
+
+      <!-- Poster -->
+      <div class="col-md-3 col-lg-2">
+        <div class="cb-detail-poster">
+          {% if movie.poster %}
+            <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="img-fluid rounded"/>
+          {% else %}
+            <div class="cb-detail-poster-placeholder">
+              {% if movie.genre %}
+                {% if movie.genre.name == 'Action' %}
+                  <img src="/static/images/pushpa_2.webp" alt="Pushpa 2" class="img-fluid rounded"/>
+                {% elif movie.genre.name == 'Sci-Fi' %}
+                  <img src="/static/images/kalki.jpg" alt="Kalki 2898 AD" class="img-fluid rounded"/>
+                {% elif movie.genre.name == 'Comedy' %}
+                  <img src="/static/images/stree_2.jpg" alt="Stree 2" class="img-fluid rounded"/>
+                {% elif movie.genre.name == 'Romance' %}
+                  <img src="/static/images/rrpk.jpg" alt="Rockey & Rani Ki Prem Kahani" class="img-fluid rounded"/>
+                {% elif movie.genre.name == 'Drama' %}
+                  <img src="/static/images/Article370.jpg" alt="Article 370" class="img-fluid rounded"/>
+                {% elif movie.genre.name == 'Thriller' %}
+                  <img src="/static/images/jailer_2.jpg" alt="Jailer 2" class="img-fluid rounded"/>
+                {% else %}
+                  <img src="/static/images/jailer_2.jpg" alt="Jailer 2" class="img-fluid rounded"/>
+                {% endif %}
+              {% else %}
+                <img src="/static/images/jailer_2.jpg" alt="Jailer 2" class="img-fluid rounded"/>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="col-md-9 col-lg-10">
+        <div class="d-flex flex-wrap gap-2 mb-2">
+          {% if movie.genre %}<span class="cb-tag">{{ movie.genre.name }}</span>{% endif %}
+          {% if movie.language %}<span class="cb-tag lang">{{ movie.language.name }}</span>{% endif %}
+          <span class="cb-tag">{{ movie.rating }}</span>
+          <span class="cb-tag">{{ movie.duration_display }}</span>
+        </div>
+        <h1 class="cb-detail-title">{{ movie.title }}</h1>
+        <div class="cb-imdb-large mb-3">⭐ {{ movie.imdb_score }} / 10</div>
+        <p class="text-muted mb-3" style="max-width:600px">{{ movie.description }}</p>
+        <div class="d-flex gap-4 text-muted small">
+          <span><i class="bi bi-calendar3 me-1"></i>{{ movie.release_date|date:"d M Y" }}</span>
+          <span><i class="bi bi-clock me-1"></i>{{ movie.duration_display }}</span>
+          <span><i class="bi bi-globe me-1"></i>{{ movie.language }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 3: YOUTUBE TRAILER -->
+  {% if trailer_embed %}
+  <div class="cb-section mt-4">
+    <h5 class="cb-section-title mb-3"><i class="bi bi-play-circle me-2 text-accent"></i>Official Trailer</h5>
+    <div class="cb-trailer-wrap">
+      <iframe src="{{ trailer_embed }}?rel=0" allowfullscreen allow="accelerometer; autoplay; encrypted-media; gyroscope"></iframe>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- SHOWTIMES -->
+  <div class="cb-section mt-4">
+    <h5 class="cb-section-title mb-3"><i class="bi bi-calendar-week me-2 text-accent"></i>Book Tickets</h5>
+
+    {% if shows_by_date %}
+      <!-- Date Tabs -->
+      <div class="cb-date-tabs mb-4" id="dateTabs">
+        {% for date, shows in shows_by_date.items %}
+        <button class="cb-date-tab {% if forloop.first %}active{% endif %}"
+                onclick="showDate('date-{{ forloop.counter }}')"
+                id="tab-{{ forloop.counter }}">
+          <span class="cb-tab-day">{{ date|date:"D" }}</span>
+          <span class="cb-tab-date">{{ date|date:"d M" }}</span>
+        </button>
+        {% endfor %}
+      </div>
+
+      <!-- Shows per date -->
+      {% for date, date_shows in shows_by_date.items %}
+      <div class="cb-date-content" id="date-{{ forloop.counter }}" {% if not forloop.first %}style="display:none"{% endif %}>
+        {% regroup date_shows by screen.theater as theater_list %}
+        {% for theater_group in theater_list %}
+        <div class="cb-theater-card mb-3">
+          <div class="cb-theater-header">
+            <div>
+              <h6 class="mb-0">{{ theater_group.grouper.name }}</h6>
+              <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ theater_group.grouper.location }}, {{ theater_group.grouper.city }}</small>
+            </div>
+          </div>
+          <div class="cb-showtime-row">
+            {% for show in theater_group.list %}
+            <a href="{% url 'movies:show_seats' show.id %}" class="cb-showtime-btn">
+              <span class="cb-time">{{ show.show_time|time:"g:i A" }}</span>
+              <span class="cb-price">₹{{ show.price }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+
+    {% else %}
+      <div class="cb-empty-state">
+        <div class="cb-empty-icon">📅</div>
+        <h5>No shows available</h5>
+        <p class="text-muted">Check back later for upcoming shows.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+{% block extra_js %}
+<script>
+function showDate(targetId) {
+  document.querySelectorAll('.cb-date-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.cb-date-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(targetId).style.display = 'block';
+  const idx = targetId.split('-')[1];
+  document.getElementById('tab-' + idx).classList.add('active');
+}
+</script>
+{% endblock %}
+{% endblock %}

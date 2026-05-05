@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CineBook - Movie Ticket Booking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ══════════════════════════════
+       NAVBAR
+  ══════════════════════════════ -->
+  <nav>
+    <div class="logo">Cine<span>Book</span></div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="showPage('home', this)">🎬 Movies</button>
+      <button class="nav-btn admin-btn" onclick="showPage('admin', this)">📊 Admin</button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════
+       PAGE: HOME — MOVIES LISTING
+  ══════════════════════════════ -->
+  <div class="page active" id="home">
+    <div class="section-title">NOW SHOWING</div>
+    <div class="section-sub">Browse, filter, and book your tickets instantly</div>
+
+    <!-- TASK 1: Genre + Language Filters -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍  Search movies..." oninput="filterMovies()"/>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Genre</span>
+        <div class="filter-chips" id="genreChips">
+          <span class="chip active" onclick="toggleChip(this,'genre')">All</span>
+          <span class="chip" onclick="toggleChip(this,'genre')" data-val="Action">Action</span>
+          <span class="chip" onclick="toggleChip(this,'genre')" data-val="Drama">Drama</span>
+          <span class="chip" onclick="toggleChip(this,'genre')" data-val="Comedy">Comedy</span>
+          <span class="chip" onclick="toggleChip(this,'genre')" data-val="Thriller">Thriller</span>
+          <span class="chip" onclick="toggleChip(this,'genre')" data-val="Sci-Fi">Sci-Fi</span>
+          <span class="chip" onclick="toggleChip(this,'genre')" data-val="Romance">Romance</span>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Language</span>
+        <div class="filter-chips" id="langChips">
+          <span class="chip active" onclick="toggleChip(this,'lang')">All</span>
+          <span class="chip" onclick="toggleChip(this,'lang')" data-val="Hindi">Hindi</span>
+          <span class="chip" onclick="toggleChip(this,'lang')" data-val="English">English</span>
+          <span class="chip" onclick="toggleChip(this,'lang')" data-val="Tamil">Tamil</span>
+          <span class="chip" onclick="toggleChip(this,'lang')" data-val="Telugu">Telugu</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Movies Grid — filled by JS -->
+    <div class="movies-grid" id="moviesGrid"></div>
+  </div>
+
+  <!-- ══════════════════════════════
+       PAGE: ADMIN DASHBOARD (TASK 6)
+  ══════════════════════════════ -->
+  <div class="page" id="admin">
+    <div class="section-title">ADMIN DASHBOARD</div>
+    <div class="section-sub">Analytics, revenue &amp; theater performance</div>
+
+    <!-- Metric Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card red">
+        <div class="metric-label">Total Revenue</div>
+        <div class="metric-value">₹4.82L</div>
+        <div class="metric-change">↑ 18.4% this month</div>
+      </div>
+      <div class="metric-card teal">
+        <div class="metric-label">Tickets Sold</div>
+        <div class="metric-value">3,291</div>
+        <div class="metric-change">↑ 12.1% this month</div>
+      </div>
+      <div class="metric-card gold">
+        <div class="metric-label">Active Bookings</div>
+        <div class="metric-value">147</div>
+        <div class="metric-change">Live today</div>
+      </div>
+      <div class="metric-card purple">
+        <div class="metric-label">Avg. Ticket Price</div>
+        <div class="metric-value">₹284</div>
+        <div class="metric-change down">↓ 2.3% vs last month</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Weekly Revenue (₹)</div>
+        <div class="bar-chart" id="revenueChart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Tickets Sold Per Day</div>
+        <div class="bar-chart" id="ticketsChart"></div>
+      </div>
+    </div>
+
+    <!-- Popular Movies Table -->
+    <div class="table-card">
+      <div class="table-header">🎬 Most Popular Movies</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Movie</th><th>Genre</th><th>Language</th>
+            <th>Tickets Sold</th><th>Revenue</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Kalki 2898 AD</b></td><td>Sci-Fi</td><td>Telugu</td><td>842</td>
+            <td>₹2.38L<div class="revenue-bar"><div class="revenue-fill" style="width:95%"></div></div></td>
+            <td><span class="status-badge active-badge">Top</span></td>
+          </tr>
+          <tr>
+            <td><b>Fighter</b></td><td>Attack</td><td>Hindi</td><td>673</td>
+            <td>₹1.91L<div class="revenue-bar"><div class="revenue-fill" style="width:76%"></div></div></td>
+            <td><span class="status-badge active-badge">Hot</span></td>
+          </tr>
+          <tr>
+            <td><b>Stree 2</b></td><td>Comedy</td><td>Hindi</td><td>589</td>
+            <td>₹1.67L<div class="revenue-bar"><div class="revenue-fill" style="width:67%"></div></div></td>
+            <td><span class="status-badge active-badge">Hot</span></td>
+          </tr>
+          <tr>
+            <td><b>Pushpa 2</b></td><td>Action</td><td>Telugu</td><td>387</td>
+            <td>₹1.10L<div class="revenue-bar"><div class="revenue-fill" style="width:44%"></div></div></td>
+            <td><span class="status-badge low-badge">Avg</span></td>
+          </tr>
+           <tr>
+            <td><b>Jailer 2</b></td><td>Thriller</td><td>Telugu</td><td>387</td>
+            <td>₹1.10L<div class="revenue-bar"><div class="revenue-fill" style="width:44%"></div></div></td>
+            <td><span class="status-badge low-badge">Avg</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Busiest Theaters Table -->
+    <div class="table-card">
+      <div class="table-header">🏟️ Busiest Theaters</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Theater</th><th>Location</th>
+            <th>Shows Today</th><th>Occupancy</th><th>Revenue Today</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><b>PVR Cinemas</b></td><td>Mumbai, Juhu</td><td>14</td><td>92%</td><td>₹38,400</td></tr>
+          <tr><td><b>INOX Megaplex</b></td><td>Pune, Koregaon</td><td>11</td><td>87%</td><td>₹29,700</td></tr>
+          <tr><td><b>Cinépolis</b></td><td>Delhi, Vasant Kunj</td><td>10</td><td>81%</td><td>₹26,200</td></tr>
+          <tr><td><b>Carnival Cinemas</b></td><td>Bangalore, Whitefield</td><td>9</td><td>74%</td><td>₹21,600</td></tr>
+          <tr><td><b>Miraj Cinemas</b></td><td>Pune, Kothrud</td><td>8</td><td>68%</td><td>₹18,900</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       MODAL: MOVIE DETAIL + TRAILER (TASK 3)
+  ══════════════════════════════ -->
+  <div class="modal-overlay" id="movieModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="movie-detail-title" id="mdTitle"></div>
+          <div class="movie-detail-tags" id="mdTags"></div>
+        </div>
+        <button class="modal-close" onclick="closeModal('movieModal')">✕</button>
+      </div>
+
+      <!-- YouTube Embed -->
+      <div class="trailer-container">
+        <iframe id="trailerFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <div class="modal-body">
+        <p class="movie-desc" id="mdDesc"></p>
+        <div class="showtimes-label">Select Showtime</div>
+        <div class="showtimes" id="mdShowtimes"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       MODAL: SEAT SELECTION (TASK 5)
+  ══════════════════════════════ -->
+  <div class="modal-overlay seat-modal" id="seatModal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <div>
+          <div class="movie-detail-title" id="seatMovieTitle"></div>
+          <div class="seat-show-info" id="seatShowInfo"></div>
+        </div>
+        <button class="modal-close" onclick="closeModal('seatModal'); clearTimer()">✕</button>
+      </div>
+
+      <!-- Reservation Countdown Timer -->
+      <div class="reservation-timer" id="reservationTimer" style="display:none">
+        <span class="timer-icon">⏱</span>
+        <span class="timer-text">Seats reserved for</span>
+        <span class="timer-count" id="timerDisplay">5:00</span>
+      </div>
+
+      <div class="modal-body">
+        <div class="screen-bar"></div>
+        <div class="screen-label">S C R E E N</div>
+
+        <!-- Seat Legend -->
+        <div class="seat-legend">
+          <span><span class="legend-dot avail"></span>Available</span>
+          <span><span class="legend-dot sel"></span>Selected</span>
+          <span><span class="legend-dot bkd"></span>Booked</span>
+          <span><span class="legend-dot rsv"></span>Reserved</span>
+        </div>
+
+        <!-- Seat Grid — filled by JS -->
+        <div class="seat-grid" id="seatGrid"></div>
+
+        <!-- Booking Summary -->
+        <div class="booking-summary" id="bookingSummary" style="display:none">
+          <div class="summary-row"><span>Movie</span><span id="sumMovie"></span></div>
+          <div class="summary-row"><span>Show</span><span id="sumShow"></span></div>
+          <div class="summary-row"><span>Seats</span><span id="sumSeats"></span></div>
+          <div class="summary-row"><span>Price / seat</span><span id="sumPrice"></span></div>
+          <div class="summary-row total"><span>TOTAL</span><span id="sumTotal"></span></div>
+        </div>
+
+        <div class="seat-actions">
+          <button class="btn-outline" onclick="closeModal('seatModal'); clearTimer()">Cancel</button>
+          <button class="btn-primary" id="proceedPayBtn" onclick="openPayment()" disabled>Proceed to Payment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       MODAL: PAYMENT (TASK 4)
+  ══════════════════════════════ -->
+  <div class="modal-overlay payment-modal" id="paymentModal">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <div class="movie-detail-title">CHECKOUT</div>
+        <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="pay-info-bar"><span id="payInfo"></span></div>
+
+        <div class="pay-method-label">Payment Method</div>
+        <div class="payment-methods">
+          <div class="payment-method active" onclick="selectPayment(this,'card')">
+            <span class="pm-icon">💳</span><div class="pm-name">Card</div>
+          </div>
+          <div class="payment-method" onclick="selectPayment(this,'upi')">
+            <span class="pm-icon">📱</span><div class="pm-name">UPI</div>
+          </div>
+          <div class="payment-method" onclick="selectPayment(this,'razorpay')">
+            <span class="pm-icon">⚡</span><div class="pm-name">Razorpay</div>
+          </div>
+          <div class="payment-method" onclick="selectPayment(this,'wallet')">
+            <span class="pm-icon">👛</span><div class="pm-name">Wallet</div>
+          </div>
+        </div>
+
+        <!-- Dynamic form filled by JS -->
+        <div class="pay-form" id="payForm">
+          <input type="text" id="cardName" placeholder="Cardholder Name"/>
+          <input type="text" id="cardNum" placeholder="Card Number" maxlength="19" oninput="formatCard(this)"/>
+          <div class="pay-row">
+            <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5" oninput="formatExp(this)"/>
+            <input type="password" id="cardCvv" placeholder="CVV" maxlength="3"/>
+          </div>
+        </div>
+
+        <div class="pay-total" id="payTotal"></div>
+        <button class="pay-submit" onclick="processPayment()">🔒 PAY NOW</button>
+        <div class="secure-badge">🔐 256-bit SSL encrypted · Razorpay secured</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       MODAL: SUCCESS + EMAIL (TASK 2)
+  ══════════════════════════════ -->
+  <div class="modal-overlay success-modal" id="successModal">
+    <div class="modal modal-sm">
+      <div class="modal-header" style="justify-content:flex-end">
+        <button class="modal-close" onclick="closeModal('successModal'); resetBooking()">✕</button>
+      </div>
+      <div class="success-body">
+        <span class="success-icon">🎟️</span>
+        <div class="success-title">BOOKING CONFIRMED!</div>
+        <div class="success-sub">Your tickets have been booked successfully.</div>
+      </div>
+
+      <!-- Ticket Card -->
+      <div class="ticket-card">
+        <div class="ticket-header">
+          <div>
+            <div class="ticket-movie" id="tcMovie"></div>
+            <div class="ticket-theater" id="tcTheater"></div>
+          </div>
+          <div class="ticket-id" id="tcId"></div>
+        </div>
+        <div class="ticket-details">
+          <div class="ticket-field">
+            <span class="ticket-field-label">Date</span>
+            <span class="ticket-field-value" id="tcDate"></span>
+          </div>
+          <div class="ticket-field">
+            <span class="ticket-field-label">Time</span>
+            <span class="ticket-field-value" id="tcTime"></span>
+          </div>
+          <div class="ticket-field">
+            <span class="ticket-field-label">Seats</span>
+            <span class="ticket-field-value" id="tcSeats"></span>
+          </div>
+          <div class="ticket-field">
+            <span class="ticket-field-label">Amount Paid</span>
+            <span class="ticket-field-value" id="tcAmount"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Confirmation Note -->
+      <div class="email-sent-note">
+        ✉️ Confirmation email sent to <b id="confirmEmail"></b>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="downloadTicket()">⬇ Download</button>
+        <button class="btn-primary" onclick="closeModal('successModal'); resetBooking()">Book More</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Processing payment...</div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

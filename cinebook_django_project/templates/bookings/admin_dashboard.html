@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container-fluid px-4 py-4">
+  <h4 class="cb-section-title mb-4"><i class="bi bi-bar-chart me-2 text-accent"></i>Admin Dashboard</h4>
+
+  <!-- Metric Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+      <div class="cb-metric-card red">
+        <div class="cb-metric-label">Total Revenue</div>
+        <div class="cb-metric-val">₹{{ total_revenue|floatformat:0 }}</div>
+        <div class="cb-metric-sub"><i class="bi bi-arrow-up-short"></i> All time</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+      <div class="cb-metric-card teal">
+        <div class="cb-metric-label">Tickets Sold</div>
+        <div class="cb-metric-val">{{ total_tickets }}</div>
+        <div class="cb-metric-sub">Confirmed seats</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+      <div class="cb-metric-card gold">
+        <div class="cb-metric-label">Total Bookings</div>
+        <div class="cb-metric-val">{{ total_bookings }}</div>
+        <div class="cb-metric-sub">Confirmed orders</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+      <div class="cb-metric-card purple">
+        <div class="cb-metric-label">Movies Listed</div>
+        <div class="cb-metric-val">{{ popular_movies|length }}</div>
+        <div class="cb-metric-sub">Active movies</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Popular Movies -->
+    <div class="col-lg-7">
+      <div class="cb-card">
+        <h6 class="fw-600 mb-3"><i class="bi bi-fire me-2 text-accent"></i>Most Popular Movies</h6>
+        <div class="table-responsive">
+          <table class="cb-table">
+            <thead><tr><th>Movie</th><th>Genre</th><th>Language</th><th>Tickets</th></tr></thead>
+            <tbody>
+              {% for movie in popular_movies %}
+              <tr>
+                <td><strong>{{ movie.title }}</strong></td>
+                <td>{% if movie.genre %}{{ movie.genre.name }}{% endif %}</td>
+                <td>{% if movie.language %}{{ movie.language.name }}{% endif %}</td>
+                <td><span class="text-teal fw-600">{{ movie.ticket_count }}</span></td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" class="text-muted text-center py-3">No data yet</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Busiest Theaters -->
+    <div class="col-lg-5">
+      <div class="cb-card">
+        <h6 class="fw-600 mb-3"><i class="bi bi-building me-2 text-accent"></i>Busiest Theaters</h6>
+        {% for theater in busiest_theaters %}
+        <div class="cb-theater-stat mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="small fw-600">{{ theater.name }}</span>
+            <span class="small text-muted">{{ theater.total_tickets }} tickets</span>
+          </div>
+          <div class="cb-progress-bar">
+            <div class="cb-progress-fill" style="width:{% if busiest_theaters.0.total_tickets > 0 %}{% widthratio theater.total_tickets busiest_theaters.0.total_tickets 100 %}{% else %}0{% endif %}%"></div>
+          </div>
+          <div class="text-muted" style="font-size:0.72rem">{{ theater.city }} · {{ theater.location }}</div>
+        </div>
+        {% empty %}
+        <p class="text-muted text-center py-3">No theater data yet</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Bookings -->
+  <div class="cb-card mt-4">
+    <h6 class="fw-600 mb-3"><i class="bi bi-clock-history me-2 text-accent"></i>Recent Bookings</h6>
+    <div class="table-responsive">
+      <table class="cb-table">
+        <thead><tr><th>Booking ID</th><th>User</th><th>Movie</th><th>Theater</th><th>Seats</th><th>Amount</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for b in recent_bookings %}
+          <tr>
+            <td><span class="text-accent font-mono">#{{ b.booking_ref }}</span></td>
+            <td>{{ b.user.get_full_name|default:b.user.username }}</td>
+            <td>{{ b.show.movie.title }}</td>
+            <td>{{ b.show.screen.theater.name }}</td>
+            <td>{{ b.seats.count }}</td>
+            <td class="text-gold fw-600">₹{{ b.total_amount }}</td>
+            <td class="text-muted small">{{ b.created_at|date:"d M, g:i A" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-muted text-center py-3">No bookings yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

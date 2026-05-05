@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Movies{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="cb-hero">
+  <div class="cb-hero-content">
+    <h1 class="cb-hero-title">Book Your <span class="text-accent">Movie</span> Tickets</h1>
+    <p class="cb-hero-sub">Instant booking · Best seats · All languages</p>
+    <form method="GET" class="cb-hero-search">
+      <input type="text" name="search" value="{{ search }}" placeholder="🔍  Search movies, genres..." class="cb-search-input"/>
+      <button type="submit" class="cb-btn-red px-4">Search</button>
+    </form>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="container-fluid px-4 mt-4">
+  <div class="cb-filter-bar">
+    <form method="GET" class="d-flex flex-wrap gap-3 align-items-end w-100" id="filterForm">
+      {% if search %}<input type="hidden" name="search" value="{{ search }}"/>{% endif %}
+
+      <!-- Genre Filter -->
+      <div class="cb-filter-group">
+        <span class="cb-filter-label">Genre</span>
+        <div class="cb-chips">
+          <a href="?{% if search %}search={{ search }}&{% endif %}" class="cb-chip {% if not selected_genre %}active{% endif %}">All</a>
+          {% for g in genres %}
+          <a href="?{% if search %}search={{ search }}&{% endif %}genre={{ g.id }}{% if selected_lang %}&language={{ selected_lang }}{% endif %}"
+             class="cb-chip {% if selected_genre == g.id|stringformat:'s' %}active{% endif %}">{{ g.name }}</a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Language Filter -->
+      <div class="cb-filter-group">
+        <span class="cb-filter-label">Language</span>
+        <div class="cb-chips">
+          <a href="?{% if search %}search={{ search }}&{% endif %}{% if selected_genre %}genre={{ selected_genre }}{% endif %}"
+             class="cb-chip {% if not selected_lang %}active{% endif %}">All</a>
+          {% for l in languages %}
+          <a href="?{% if search %}search={{ search }}&{% endif %}{% if selected_genre %}genre={{ selected_genre }}&{% endif %}language={{ l.id }}"
+             class="cb-chip {% if selected_lang == l.id|stringformat:'s' %}active{% endif %}">{{ l.name }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- RESULTS COUNT -->
+  <div class="d-flex justify-content-between align-items-center my-3">
+    <h5 class="cb-section-title mb-0">
+      {% if search %}Results for "{{ search }}"{% else %}Now Showing{% endif %}
+      <span class="cb-count">{{ movies|length }} movies</span>
+    </h5>
+  </div>
+
+  <!-- MOVIES GRID -->
+  {% if movies %}
+  <div class="cb-movies-grid">
+    {% for movie in movies %}
+    <div class="cb-movie-card" onclick="window.location='{% url 'movies:movie_detail' movie.pk %}'">
+      <div class="cb-poster">
+        {% if movie.poster %}
+          <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="cb-poster-img"/>
+        {% else %}
+          <div class="cb-poster-placeholder">
+            {% if movie.genre.name == 'Action' %}⚔️
+            {% elif movie.genre.name == 'Comedy' %}😂
+            {% elif movie.genre.name == 'Sci-Fi' %}🚀
+            {% elif movie.genre.name == 'Romance' %}💕
+            {% elif movie.genre.name == 'Horror' %}👻
+            {% elif movie.genre.name == 'Drama' %}🎭
+            {% elif movie.genre.name == 'Thriller' %}🔪
+            {% else %}🎬{% endif %}
+          </div>
+        {% endif %}
+        <div class="cb-poster-overlay">
+          <span class="cb-imdb">⭐ {{ movie.imdb_score }}</span>
+          <span class="cb-cert-badge">{{ movie.rating }}</span>
+        </div>
+      </div>
+      <div class="cb-movie-info">
+        <h6 class="cb-movie-title">{{ movie.title }}</h6>
+        <div class="cb-movie-meta">
+          {% if movie.genre %}<span class="cb-tag">{{ movie.genre.name }}</span>{% endif %}
+          {% if movie.language %}<span class="cb-tag lang">{{ movie.language.name }}</span>{% endif %}
+        </div>
+        <div class="cb-movie-footer">
+          <span class="cb-duration"><i class="bi bi-clock me-1"></i>{{ movie.duration_display }}</span>
+          <a href="{% url 'movies:movie_detail' movie.pk %}" class="cb-book-btn">Book Now</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="cb-empty-state">
+    <div class="cb-empty-icon">🎬</div>
+    <h4>Try some another way</h4>
+    <p class="text-muted">Use a different filter or search term</p>
+    <a href="{% url 'movies:home' %}" class="cb-btn-red">Clear Filters</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Booking Confirmed!{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:640px">
+  <div class="cb-card text-center mb-4">
+    <div class="cb-success-icon">🎟️</div>
+    <h2 class="cb-success-title">Booking Confirmed!</h2>
+    <p class="text-muted">Your tickets have been booked successfully.</p>
+
+    {% if booking.email_sent %}
+    <div class="cb-email-note">
+      <i class="bi bi-envelope-check me-2"></i>
+      Confirmation email sent to <strong>{{ booking.user.email }}</strong>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- TICKET CARD -->
+  <div class="cb-ticket-card">
+    <div class="cb-ticket-header">
+      <div>
+        <div class="cb-ticket-movie">{{ booking.show.movie.title }}</div>
+        <div class="text-muted small">{{ booking.show.screen.theater.name }}, {{ booking.show.screen.theater.city }}</div>
+      </div>
+      <div class="cb-ticket-id">#{{ booking.booking_ref }}</div>
+    </div>
+
+    <div class="cb-ticket-details">
+      <div class="cb-ticket-field">
+        <span class="cb-ticket-label">Date</span>
+        <span class="cb-ticket-val">{{ booking.show.show_date|date:"D, d M Y" }}</span>
+      </div>
+      <div class="cb-ticket-field">
+        <span class="cb-ticket-label">Time</span>
+        <span class="cb-ticket-val">{{ booking.show.show_time|time:"g:i A" }}</span>
+      </div>
+      <div class="cb-ticket-field">
+        <span class="cb-ticket-label">Screen</span>
+        <span class="cb-ticket-val">{{ booking.show.screen.name }}</span>
+      </div>
+      <div class="cb-ticket-field">
+        <span class="cb-ticket-label">Seats</span>
+        <span class="cb-ticket-val text-accent">
+          {% for seat in seats %}{{ seat.seat_number }}{% if not forloop.last %}, {% endif %}{% endfor %}
+        </span>
+      </div>
+      <div class="cb-ticket-field">
+        <span class="cb-ticket-label">Payment</span>
+        <span class="cb-ticket-val">{{ booking.get_payment_method_display }}</span>
+      </div>
+      <div class="cb-ticket-field">
+        <span class="cb-ticket-label">Amount Paid</span>
+        <span class="cb-ticket-val text-gold fw-700">₹{{ booking.total_amount }}</span>
+      </div>
+    </div>
+
+    <div class="cb-ticket-footer">
+      <div class="cb-barcode">
+        {% for c in booking.booking_ref %}
+        <div class="cb-bar" style="height:{% widthratio forloop.counter 1 45 %}px"></div>
+        {% endfor %}
+      </div>
+      <div class="cb-barcode-text">{{ booking.booking_ref }}</div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="d-flex gap-3 mt-4">
+    <a href="{% url 'movies:home' %}" class="cb-btn-outline flex-1 text-center">
+      <i class="bi bi-film me-2"></i>Book More
+    </a>
+    <a href="{% url 'bookings:my_bookings' %}" class="cb-btn-red flex-1 text-center">
+      <i class="bi bi-ticket me-2"></i>My Bookings
+    </a>
+  </div>
+</div>
+{% endblock %}
